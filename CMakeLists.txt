@@ -1,0 +1,7 @@
+cmake_minimum_required (VERSION 3.0)
+project (PFDAS-API)
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
+set(CMAKE_C_FLAGS "-std=c99 ${CMAKE_C_FLAGS}")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+add_executable(PFDAS_TEST pfdas_example.c PFDAS_packet_types.h PFDAS_api.h PFDAS_fpga_payload.c PFDAS_fpga_payload.h)
+target_link_libraries(PFDAS_TEST pfdas-api-1)

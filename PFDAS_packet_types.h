@@ -1,0 +1,88 @@
+/* -------------------------------------------------------------------------- */
+/* (C) Copyright 2023 Precision Filters Inc., Ithaca, NY.                     */
+/* All Rights Reserved.                                                       */
+/* --------------------------------------------------------------------------
+ * -------------------------------------------------------------------------- */
+#ifndef __PFDAS_PACKET_TYPES_H__
+#define __PFDAS_PACKET_TYPES_H__
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include <stdint.h>
+typedef unsigned char byte; 
+enum PFDAS_PACKET_IDS {
+    PFDAS_PACKET_BASE = 170,           /* Used to indicate the first byte in the packet, this is a constant set in PFDAS_base_packet_t::packet_type.                                  */
+    PFDAS_PACKET_BASE_ACK = 1,         /* The optional data ack packet, it is send from client -> server, this is a constant set in PFDAS_base_packet_t::packet_type. */
+    PFDAS_PACKET_AUTH = 8,             /* Packet type to authenticate client, this is set in Rdas_auth_packet_t::packet_type. Sent from client -> server.  */
+    /**/
+    /* Real payloads set in Rdas_data_packet_t::payload_type from server -> client. */
+    PFDAS_PAYLOAD_CH_DATA = 2,         /* The adc payload data, this comprises the bulk of what is sent. */
+    PFDAS_PAYLOAD_PTP4L_STATS = 3,     /* ptp4l timing stats, sent 1/sec.                                */
+    PFDAS_PAYLOAD_PHC2SYS_STATS = 4,   /* phyc2sys timing stats, sent 1/sec.                             */
+    PFDAS_PAYLOAD_PPS_SYNC_STATS = 5,  /* pps-sync timing stats, sent 1/sec.                             */
+    PFDAS_PAYLOAD_LCS_CMD = 6,         /* lcs command (text) packet, sent on connect and on any LCS command. */
+    /**/
+    /* Alternates  */
+    PFDAS_MESSAGE_CONNECT_REJECT = 7,  /* Packet message to reject a connection, send from server to client. This is set in Rdas_data_packet_t::payload_type. */
+    PFDAS_MESSAGE_AUTH_FAIL = 9,       /* Packet message to inform client authentication failed. This is set in Rdas_data_packet_t::payload_type. If Authentication did not fail then the client will not get disconnected. */
+    PFDAS_MESSAGE_STREAM_VER = 10,     /* Packet message to indicate the stream version. The union field RDAS_data_packet::version is now the version number of the stream. */
+    PFDAS_STREAM_TYPE_DYNAMIC_1 = 99,  /* Unique this is the first byte sent (unsigned char) when the socket is connected. It indicates the stream type. */
+    PFDAS_STREAM_VERSION_1 = 100,      /* With the packet message _STREAM_VER the field version has this value (or for future other value to indicate variant of the stream type. */
+};
+/**/
+//struct PFDAS_base_packet_t { /* 16 bytes */
+struct PFDAS_base_packet_t { /* 16 bytes */
+    byte packet_type;       /* This has to be the first element in the struct, the client code uses the first byte to confirm it is at the beginning of a packet. */
+    union{
+    	byte payload_type;  /* The type of payload that follows this packet. */
+    	byte message;       /* Alternate, the message type. */
+    };
+    byte system_id;         /* The system identifier, not used but needs to be. */
+    union {
+    	byte channel;       /* Channel number 0-15. */
+    	byte version;       /* For payload type = PFDAS_MESSAGE_STREAM_VER this is the version of the stream. */
+    };
+    uint32_t payload_size;  /* Size of the payload packet that follows this packet. */
+    uint64_t packet_id;     /* For CH_DATA this is the dma counter, combined with channel number it is unique. Otherwise this is a global packet counter. */
+};
+/* CH_DATA payload is right after the struct of size payload_size. */
+/* CH_DATA payload is not readily definable via struct.            */
+/**/
+struct PFDAS_packet_payload_ptp4l_t {
+    uint32_t sec;
+    uint32_t nsec;
+    int32_t offset;
+    int32_t freq;
+    int32_t path_delay;
+    int32_t unused;
+};
+struct PFDAS_packet_payload_phc2sys_t {
+    uint32_t sec;
+    uint32_t nsec;
+    int32_t offset;
+    int32_t freq;
+    int32_t path_delay;
+    int32_t unused;
+};
+struct PFDAS_packet_payload_pps_sync_t {
+    uint32_t sec;
+    uint32_t nsec;
+    int32_t error;
+    int32_t addend;
+};
+struct PFDAS_packet_payload_lcs_cmd_t {
+    uint32_t sec;
+    uint32_t nsec;
+    uint16_t text_size;
+    /* payload is right after the struct of size "text_size". */
+};
+struct PFDAS_auth_packet_t {
+    byte packet_type;      /* This has to be the first element in the struct, the client code uses the first byte to confirm it is at the beginning of a packet. */
+    char user[256];
+    char pass[256];
+};
+#ifdef __cplusplus
+}
+#endif
+//
+#endif

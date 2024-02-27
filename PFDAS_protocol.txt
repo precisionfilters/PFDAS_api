@@ -1,0 +1,17 @@
+
+/* PFDAS Dynamic Data Protocol V1.
+1. On connection to socket the server transmits 1 byte to indicate the stream type. Currently only stream type is defined: PFDAS_STREAM_TYPE_DYNAMIC_1.
+2. If there is an existing connection to socket a PFDAS_base_packet_t is sent with message = PFDAS_MESSAGE_CONNECT_REJECT, then socket is closed.
+3. Client sends PFDAS_auth_packet with user name and password supplied.
+   3a. If user name password is correct data begins streaming.
+   3b. If user name password is incorrect PFDAS_base_packet is transmitted to client with message = PFDAS_MESSAGE_AUTH_FAIL.
+4. All packets sent to client are of type PFDAS_base_packet_t. These packets can be sent in any order at any time. The payload size is separate from the sizeof(PFDAS_base_packet_t) in all cases.
+   4a. If packet_type = PFDAS_PAYLOAD_CH_DATA then the payload_size is to be read directly after the packet which contains the FPGA payload. The FPGA payload can be extracted using C functions in PFDAS_fpga_payload.c.
+   4b. If packet_type = PFDAS_PAYLOAD_PTP4L_STATS then the payload_size is the the sizeof(PFDAS_packet_payload_ptp4l_t) and that struct should be read after the packet.
+   4c. If packet_type = PFDAS_PAYLOAD_PHC2SYS_STATS then the payload_size is the the sizeof(PFDAS_packet_payload_phc2sys_t) and that struct should be read after the packet.
+   4d. If packet_type = PFDAS_PAYLOAD_PPS_SYNC_STATS then the payload_size is the the sizeof(PFDAS_packet_payload_pps_sync_t) and that struct should be read after the packet.
+   4d. If packet_type = PFDAS_PAYLOAD_LCS_CMD then the payload_size is the the sizeof(PFDAS_packet_payload_lcs_cmd_t) + text_size and that struct should be read after the packet.
+5. PFDAS_packet_payload_lcs_cmd_t is unique in that it has a variable size text payload after it. The read operation is: read sizeof(PFDAS_base_packet_t) then read in payload_size.
+   The second read (payload_size) will contain the PFDAS_packet_payload_lcs_cmd_t and the variable size text payload after it. The variable size text payload is of size text_size. This packet can
+   have one LCS command or a set of commands.
+*/
