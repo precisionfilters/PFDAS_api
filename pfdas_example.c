@@ -67,6 +67,10 @@ int main(int argc, char *argv[]) {
                 const struct PFDAS_packet_payload_pps_sync_t* pl =  PFDAS_meta_pps_sync_payload(p); // Extract payload which is a simple struct.
                 printf("got pps_sync offset=%d\n", pl->error);
             }
+			if(p->payload_type == PFDAS_PAYLOAD_TIME_STAMPS){
+                const struct PFDAS_packet_payload_time_stamp_t* pl =  PFDAS_meta_time_stamp_payload(p);
+                printf("got time_stamp =%d\n", pl->sec_fpga);
+            }
             PFDAS_meta_return_pkt(p, dhandle); // Important!, must return packet after it is done being used.
         }
       	Sleep(1); // Pace the loop some.

@@ -10,7 +10,8 @@
    4b. If packet_type = PFDAS_PAYLOAD_PTP4L_STATS then the payload_size is the the sizeof(PFDAS_packet_payload_ptp4l_t) and that struct should be read after the packet.
    4c. If packet_type = PFDAS_PAYLOAD_PHC2SYS_STATS then the payload_size is the the sizeof(PFDAS_packet_payload_phc2sys_t) and that struct should be read after the packet.
    4d. If packet_type = PFDAS_PAYLOAD_PPS_SYNC_STATS then the payload_size is the the sizeof(PFDAS_packet_payload_pps_sync_t) and that struct should be read after the packet.
-   4d. If packet_type = PFDAS_PAYLOAD_LCS_CMD then the payload_size is the the sizeof(PFDAS_packet_payload_lcs_cmd_t) + text_size and that struct should be read after the packet.
+   4e. If packet_type = PFDAS_PAYLOAD_LCS_CMD then the payload_size is the the sizeof(PFDAS_packet_payload_lcs_cmd_t) + text_size and that struct should be read after the packet.
+   4f. If packet_type = PFDAS_PAYLOAD_TIME_STAMPS then the payload_size is the the sizeof(PFDAS_packet_payload_time_stamps_t) and that struct should be read after the packet.
 5. PFDAS_packet_payload_lcs_cmd_t is unique in that it has a variable size text payload after it. The read operation is: read sizeof(PFDAS_base_packet_t) then read in payload_size.
    The second read (payload_size) will contain the PFDAS_packet_payload_lcs_cmd_t and the variable size text payload after it. The variable size text payload is of size text_size. This packet can
    have one LCS command or a set of commands.

@@ -185,6 +185,16 @@ __declspec(dllexport) const struct PFDAS_packet_payload_ptp4l_t* __cdecl PFDAS_m
 __declspec(dllexport) const struct PFDAS_packet_payload_pps_sync_t* __cdecl PFDAS_meta_pps_sync_payload(const struct PFDAS_base_packet_t*);
 /****************************************************************************************************************/
 /**
+ * \brief Return the payload system time stamp and status from the PFDAS_base_packet_t.
+ *
+ * Time stamp and status of current timing source.
+ *
+ * \param p Pointer to PFDAS_base_packet_t previously obtained by PFDAS_meta_get_pkt(...).
+ * \return Pointer to the payload structure.
+ */
+__declspec(dllexport) const struct PFDAS_packet_payload_time_stamp_t* __cdecl PFDAS_meta_time_stamp_payload(const struct PFDAS_base_packet_t*);
+/****************************************************************************************************************/
+/**
  * \brief Return the payload fpga payload from the PFDAS_base_packet_t.
  * 
  * The payload contains one channel of the FPGA formatted header and sample adc counts.

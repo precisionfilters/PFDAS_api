@@ -21,6 +21,7 @@ enum PFDAS_PACKET_IDS {
     PFDAS_PAYLOAD_PHC2SYS_STATS = 4,   /* phyc2sys timing stats, sent 1/sec.                             */
     PFDAS_PAYLOAD_PPS_SYNC_STATS = 5,  /* pps-sync timing stats, sent 1/sec.                             */
     PFDAS_PAYLOAD_LCS_CMD = 6,         /* lcs command (text) packet, sent on connect and on any LCS command. */
+    PFDAS_PAYLOAD_TIME_STAMPS = 11,
     /**/
     /* Alternates  */
     PFDAS_MESSAGE_CONNECT_REJECT = 7,  /* Packet message to reject a connection, send from server to client. This is set in Rdas_data_packet_t::payload_type. */
@@ -70,6 +71,38 @@ struct PFDAS_packet_payload_pps_sync_t {
     int32_t error;
     int32_t addend;
 };
+/* */
+enum {
+    PFDAS_PTP_STS_UNKNOWN = 0,
+    PFDAS_PTP_STS_GOOD = 1,
+    PFDAS_PTP_STS_REDETECTED_GM = 2,
+    PFDAS_PTP_STS_OFF = 3,
+    PFDAS_PTP_STS_NO_GM = 4,
+    PFDAS_PTP_STS_RESTARING = 4,
+};
+enum {
+    PFDAS_PPS_SRC_UNKNOWN = 0,
+    PFDAS_PPS_SRC_PTP = 1,
+    PFDAS_PPS_SRC_IRIG_AM = 2,
+    PFDAS_PPS_SRC_IRIG_DCLS = 3,
+    PFDAS_PPS_SRC_EXTERNAL_PPS = 4
+};
+typedef union {
+   struct {
+      unsigned pps_src:3;    // D[2:0] 1588, IRIGB, IRIG_DCLS, PPS
+      unsigned ptp_sts:3; // D[3:5] PFDAS_PTP_STS enums.
+      unsigned unused:26;    // D[31:6] unused
+   } BIT_VAL;
+   uint32_t UINT32_VAL;
+} time_status_t;
+struct PFDAS_packet_payload_time_stamp_t {
+    time_status_t time_status; // Bit fields for status
+    uint32_t sec_emac1;
+    uint32_t sec_fpga;
+    uint32_t sec_irig;
+    uint32_t sec_linux;
+};
+/* */
 struct PFDAS_packet_payload_lcs_cmd_t {
     uint32_t sec;
     uint32_t nsec;
