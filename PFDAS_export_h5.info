@@ -1,0 +1,6 @@
+fname=Export to HDF5 (my_dataset)
+version=0.1
+author=jpietzuch@pfinc.com
+date=May 16 2025 09:12:25
+info=HDF5 Library Version: 1.14.4
+info=Exporting time domain samples to dataset: my_dataset
